@@ -7,6 +7,20 @@
         string fileContent = pvf.getPvfFileByPath("equipment/equipment.lst", Encoding.UTF8);
         pvf.dispose();//不用了就释放掉
 ```
+# Godot Mono C# 调用的特殊情况
+目前发现在4.5.1版本，代码运行会报错，经排查，是.NET Core框架缺少非标准Encoding编码支持导致。<br>
+.NET Core默认仅内置支持 UTF-8、UTF-16 等标准编码，缺少对旧代码页编码（如 GB2312、GB18030、ISO-8859-1）的支持。<br>
+解决方法：在vscode终端分别运行以下命令，nuget将配置扩展编码包，包括CP949（韩语）和BIG5（台湾繁体）的支持。
+``` Shell
+    dotnet add package System.Text.Encoding.CodePages
+    dotnet restore
+```
+之后，在Pvf的构造函数中的首行添加以下代码，这将启用Encoding对非标准文字编码的访问，以提供CP949（韩语）和BIG5（台湾繁体）的支持。
+``` C#
+    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+```
+
+# 在Winform的使用方法：
 打开文件并初始化PVF对象，排序显示到TreeView中：
 ``` C#
         private void 打开ToolStripMenuItem_Click(object sender, EventArgs e)
