@@ -30,10 +30,6 @@ namespace pvfLoaderXinyu
             for (int i = 0; i < header.numFilesInDirTree; i++)
             {
                 HeaderTreeNode item = new HeaderTreeNode();
-                /*
-                 如果原版代码出现报错"读取错误，格式非法"，大部分情况是readNodeFromBitArrStream()内的Encoding配置错误，
-                 有可能是PVFUtility（dnf台服最常用的pvf修改工具）修改了编码，需手动修改源码的编码配置部分，目前测试utf-8未出现报错。
-                 */
                 int a = item.readNodeFromBitArrStream(header,fs,decryptedTree,pos);//从pos位置开始读取HeaderTreeNode对象，返回值为指针应该偏移的字节数
                 if (a < 0)
                     throw new Exception("读取错误，格式非法");//读取错误直接报错
@@ -56,9 +52,7 @@ namespace pvfLoaderXinyu
                 int index = i;//索引就是出现的第几个
                 var pathBytes = new byte[len];//分配内存以存储该值的字符串
                 Array.Copy(unpackedFileByteArr, startpos + 4, pathBytes, 0, len);//取出该字符串内容
-                //string pathName = Encoding.GetEncoding("BIG5").GetString(pathBytes).TrimEnd(new char[1]);//解码，这里使用的是BIG5，对于某些文件不一定正确，如果需要更正可以在这个编码这里下手。
-                // 上行代码为原版代码，经运行出现编码格式报错，目前暂修改为utf8。
-                string pathName = Encoding.GetEncoding("utf-8").GetString(pathBytes).TrimEnd(new char[1]);
+                string pathName = Encoding.GetEncoding("BIG5").GetString(pathBytes).TrimEnd(new char[1]);//解码，这里使用的是BIG5，对于某些文件不一定正确，如果需要更正可以在这个编码这里下手。
                 stringBinMap[index] = pathName;//放到索引表中备用
             }
         }
@@ -74,9 +68,7 @@ namespace pvfLoaderXinyu
                     var node = headerTreeCache[k.ToLower().Trim()];//取出来的stringtable的值是文件列表的一个文件的文件名，不过使用了驼峰命名需要将其置为小写并清除空格。
                     if (node != null)//如果找到了这个文件
                     {
-                        //string full = Encoding.GetEncoding("BIG5").GetString(node.unpackedFileByteArr).TrimEnd(new char[1]);//直接用编码取这个文件的内容
-                        // 上行代码为原版代码，经运行出现编码格式报错，目前暂修改为utf8。
-                        string full = Encoding.GetEncoding("utf-8").GetString(node.unpackedFileByteArr).TrimEnd(new char[1]);
+                        string full = Encoding.GetEncoding("BIG5").GetString(node.unpackedFileByteArr).TrimEnd(new char[1]);//直接用编码取这个文件的内容
                         foreach (string line in full.Split(new char[2] { '\r', '\n' }))//根据换行分割，逐行遍历
                         {
                             if (line.IndexOf('>') >= 0)//行包含符号'>'，如name_xxx>格斗家

@@ -49,13 +49,7 @@ namespace pvfLoaderXinyu
                         unpackedFileByteArr[fileLength + i] = 0;
                     }
                 }
-                //filePathName = Encoding.GetEncoding(0x3b5).GetString(filePath).TrimEnd(new char[1]);//CP949(韩语)
-                // 上行代码为原版代码，经测试0x3b5（即CP949韩语编码）会报错，修改为utf-8后程序未出现报错。
-                // 尚不清楚其他文本是否会出现乱码，如有乱码再修改。
-                
-                var encoding = Encoding.GetEncoding("utf-8");
-                filePathName = encoding.GetString(filePath);
-                filePathName = filePathName.TrimEnd(new char[1]);
+                filePathName = Encoding.GetEncoding(0x3b5).GetString(filePath).TrimEnd(new char[1]);//CP949(韩语)
                 return filePathLength + 20;
             }
             catch
